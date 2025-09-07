@@ -358,9 +358,18 @@ async def get_dashboard_data(user_id: int):
         medications_result = supabase.table("medications").select("*").eq("user_id", user_id).eq("is_active", True).execute()
         medications = medications_result.data or []
         
-        # Convert reminder_times back to list for each medication
+        # Convert reminder_times safely for each medication
         for med in medications:
-            med["reminder_times"] = json.loads(med["reminder_times"])
+            val = med.get("reminder_times")
+            try:
+                if isinstance(val, str):
+                    med["reminder_times"] = json.loads(val)
+                elif isinstance(val, list):
+                    med["reminder_times"] = val
+                else:
+                    med["reminder_times"] = []
+            except Exception:
+                med["reminder_times"] = []
         
         # Get recent mood
         mood_result = supabase.table("mood_logs").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(1).execute()
