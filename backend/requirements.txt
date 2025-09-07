@@ -2,8 +2,8 @@ fastapi==0.104.1
 uvicorn==0.24.0
 supabase==2.0.2
 transformers==4.35.2
-# Use CPU-only wheel to keep Railway builds small and fast
-torch==2.1.1+cpu
+# Use a Render-supported CPU-only torch wheel
+torch==2.5.1+cpu
 python-multipart==0.0.6
 pydantic==2.5.0
 python-dotenv==1.0.0

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: auracare-api
+    env: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main_supabase:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PIP_EXTRA_INDEX_URL
+        value: https://download.pytorch.org/whl/cpu
+
