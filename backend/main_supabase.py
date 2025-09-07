@@ -21,7 +21,10 @@ app = FastAPI(title="HealthMate AI Guardian API", version="1.0.0")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # Allow local dev and hosted frontends (Vercel domains)
+    allow_origins=[
+        "*"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
