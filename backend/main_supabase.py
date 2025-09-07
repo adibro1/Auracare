@@ -112,8 +112,18 @@ class InsightResponse(BaseModel):
     streak_count: int = 0
     streak_type: str = "medication"  # medication, mood
 
-# Initialize sentiment analysis pipeline
-sentiment_pipeline = pipeline("sentiment-analysis", model="cardiffnlp/twitter-roberta-base-sentiment-latest")
+# Lazy-init sentiment analysis pipeline to reduce boot memory on small hosts
+_sentiment_pipeline = None
+
+def get_sentiment_pipeline():
+    global _sentiment_pipeline
+    if _sentiment_pipeline is None:
+        model_name = os.getenv(
+            "SENTIMENT_MODEL",
+            "distilbert-base-uncased-finetuned-sst-2-english",  # lightweight, fast
+        )
+        _sentiment_pipeline = pipeline("sentiment-analysis", model=model_name)
+    return _sentiment_pipeline
 
 # Email configuration
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
@@ -234,8 +244,8 @@ async def create_mood_log(mood_log: MoodLogCreate):
     check_database()
     
     try:
-        # Analyze sentiment
-        result = sentiment_pipeline(mood_log.mood_text)
+        # Analyze sentiment (lazy model load)
+        result = get_sentiment_pipeline()(mood_log.mood_text)
         sentiment_score = result[0]['score']
         sentiment_label = result[0]['label']
         
